@@ -35,13 +35,13 @@ jobs:
           echo "    const page = await context.newPage();" >> script.js
 
           # Navegar para a página do vídeo do TikTok
-          echo "    await page.goto('https://www.youtube.com/watch?app=desktop&v=mNhkFOYv4Aw');" >> script.js
+          echo "    await page.goto('https://m.youtube.com/watch?v=mNhkFOYv4Aw');" >> script.js
 
           # Aguardar o carregamento da página do vídeo
-          echo "    await page.waitForTimeout(0);
-          
+          echo "    await page.waitForTimeout(5000);  // Aguarda 5 segundos para garantir que a página carregou" >> script.js
+
           # Esperar por um tempo para ver a ação
-          echo "    await page.waitForTimeout(5000);  // Aguarda 5 segundos para ver a interação" >> script.js
+          echo "    await page.waitForTimeout(5000);  // Aguarda 10 segundos para ver a interação" >> script.js
           echo "    await browser.close();" >> script.js
           echo "  }" >> script.js  # Fecha o loop
           echo "})();" >> script.js
