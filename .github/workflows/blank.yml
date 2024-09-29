@@ -1,36 +1,50 @@
-# This is a basic workflow to help you get started with Actions
+name: Run Playwright to Like a TikTok Video
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  run_playwright:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # Instalar dependências do Playwright e xvfb
+      - name: Install Dependencies
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          sudo apt-get update
+          sudo apt-get install -y wget unzip xvfb
+
+      # Instalar Playwright
+      - name: Install Playwright
+        run: |
+          npm install -D playwright
+          npx playwright install  # Instala navegadores necessários
+
+      # Criar e executar o script do Playwright
+      - name: Run Playwright Script
+        run: |
+          echo "const { chromium, devices } = require('playwright');" > script.js
+          echo "const fs = require('fs');" >> script.js
+          echo "const iPhone = devices['iPhone 12'];" >> script.js  # Define o dispositivo como iPhone 12
+          echo "(async () => {" >> script.js
+          echo "  for (let i = 0; i < 100; i++) {" >> script.js  # Loop para repetir a ação 100 vezes
+          echo "    const browser = await chromium.launch({ headless: false });" >> script.js  # Mude para true para headless
+          echo "    const context = await browser.newContext({ ...iPhone });" >> script.js  # Usando a simulação do iPhone
+          echo "    const page = await context.newPage();" >> script.js
+
+          # Navegar para a página do vídeo do TikTok
+          echo "    await page.goto('https://www.youtube.com/watch?app=desktop&v=mNhkFOYv4Aw');" >> script.js
+
+          # Aguardar o carregamento da página do vídeo
+          echo "    await page.waitForTimeout(0);
+          
+          # Esperar por um tempo para ver a ação
+          echo "    await page.waitForTimeout(5000);  // Aguarda 5 segundos para ver a interação" >> script.js
+          echo "    await browser.close();" >> script.js
+          echo "  }" >> script.js  # Fecha o loop
+          echo "})();" >> script.js
+
+          # Executa o script com xvfb
+          xvfb-run -a node script.js  # Executa o script com xvfb
